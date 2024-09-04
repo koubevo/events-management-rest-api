@@ -24,6 +24,7 @@ class EventController extends Controller implements HasMiddleware
     {
         return [
             new Middleware('auth:sanctum', except: ['index', 'show']),
+            new Middleware('throttle:60,1', only: ['store', 'destroy', 'update']),
         ];
     }
 
