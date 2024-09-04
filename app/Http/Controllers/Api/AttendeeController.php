@@ -32,6 +32,8 @@ class AttendeeController extends Controller implements HasMiddleware
      */
     public function index(Event $event)
     {
+        $this->authorize('viewAny', Attendee::class);
+
         $attendees = $this->loadRelationships($event->attendees()->latest());
 
         return AttendeeResource::collection(
@@ -44,6 +46,8 @@ class AttendeeController extends Controller implements HasMiddleware
      */
     public function store(Request $request, Event $event)
     {
+        $this->authorize('create', Event::class);
+
         $attendee = $this->loadRelationships(
             $event->attendees()->create([
                 'user_id' => 1
@@ -58,6 +62,8 @@ class AttendeeController extends Controller implements HasMiddleware
      */
     public function show(Event $event, Attendee $attendee)
     {
+        $this->authorize('view', $attendee);
+
         return new AttendeeResource($this->loadRelationships($attendee));
     }
 
@@ -74,7 +80,8 @@ class AttendeeController extends Controller implements HasMiddleware
      */
     public function destroy(Event $event, Attendee $attendee)
     {
-        $this->authorize('delete-attendee', [$event, $attendee]);
+        $this->authorize('delete', $attendee);
+
         $attendee->delete();
 
         return response(status: 204);

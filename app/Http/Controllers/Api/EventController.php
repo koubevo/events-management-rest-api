@@ -33,6 +33,8 @@ class EventController extends Controller implements HasMiddleware
      */
     public function index()
     {
+        $this->authorize('viewAny', Event::class);
+
         $relations = ['user', 'attendees', 'attendees.user'];
         $query = $this->loadRelationships(Event::query(), $relations);
 
@@ -48,6 +50,8 @@ class EventController extends Controller implements HasMiddleware
      */
     public function store(Request $request)
     {
+        $this->authorize('create', Event::class);
+
         $data = $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
@@ -66,6 +70,8 @@ class EventController extends Controller implements HasMiddleware
      */
     public function show(Event $event)
     {
+        $this->authorize('view', $event);
+
         $event->load('user', 'attendees');
         return new EventResource($this->loadRelationships($event));
     }
@@ -75,7 +81,7 @@ class EventController extends Controller implements HasMiddleware
      */
     public function update(Request $request, Event $event)
     {
-        $this->authorize('update-event', $event);
+        $this->authorize('update', $event);
 
         $event->update($request->validate([
             'name' => 'sometimes|string|max:255',
@@ -92,6 +98,8 @@ class EventController extends Controller implements HasMiddleware
      */
     public function destroy(Event $event)
     {
+        $this->authorize('delete', $event);
+
         $event->delete();
 
         return response(status: 204);
